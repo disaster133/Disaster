@@ -1,0 +1,177 @@
+{
+    "admins": {
+      "admin": {
+        "username": "admin",
+        "password": "admin"
+      }
+    },
+    "disasters": {
+      "101": {
+        "name": "Flood in New York",
+        "type": "Flood",
+        "city": "New York",
+        "severity": 8,
+        "startDate": "2024-01-01",
+        "endDate": "2024-01-05"
+      },
+      "102": {
+        "name": "Wildfire in California",
+        "type": "Fire",
+        "city": "Los Angeles",
+        "severity": 9,
+        "startDate": "2024-03-01",
+        "endDate": "2024-03-03"
+      },
+      "103": {
+        "name": "Earthquake in San Francisco",
+        "type": "Earthquake",
+        "city": "San Francisco",
+        "severity": 7,
+        "startDate": "2024-04-10",
+        "endDate": "2024-04-12"
+      }
+    },
+    "evacuationPlans": {
+      "101": {
+        "evacuationRequired": true,
+        "description": "Evacuate lower Manhattan due to expected flooding."
+      },
+      "102": {
+        "evacuationRequired": true,
+        "description": "Evacuate northern parts of Los Angeles due to approaching fire."
+      },
+      "103": {
+        "evacuationRequired": false,
+        "description": null
+      }
+    },
+    "alerts": {
+      "201": {
+        "disasterId": 101,
+        "message": "Flood alert for New York! Evacuate lower Manhattan."
+      },
+      "202": {
+        "disasterId": 102,
+        "message": "Wildfire spreading in Northern Los Angeles, evacuation in process."
+      },
+      "203": {
+        "disasterId": 103,
+        "message": "Earthquake in San Francisco. Stay safe indoors!"
+      }
+    },
+    "volunteers": {
+      "301": {
+        "name": "Suresh Reddy",
+        "disasterId": 101,
+        "role": "Evacuation Coordinator"
+      },
+      "302": {
+        "name": "Rohit Sharma",
+        "disasterId": 101,
+        "role": "Medical Aid"
+      },
+      "303": {
+        "name": "Kavita Iyer",
+        "disasterId": 102,
+        "role": "Firefighter"
+      },
+      "304": {
+        "name": "Anita Gupta",
+        "disasterId": 102,
+        "role": "Shelter Manager"
+      },
+      "305": {
+        "name": "Rahul Verma",
+        "disasterId": 103,
+        "role": "First Responder"
+      }
+    },
+    "shelters": {
+      "401": {
+        "disasterId": 101,
+        "location": "Brooklyn, New York",
+        "capacity": 500,
+        "status": "Available"
+      },
+      "402": {
+        "disasterId": 102,
+        "location": "Burbank, Los Angeles",
+        "capacity": 300,
+        "status": "Available"
+      },
+      "403": {
+        "disasterId": 103,
+        "location": "San Jose, California",
+        "capacity": 400,
+        "status": "Full"
+      }
+    },
+    "resources": {
+      "501": {
+        "disasterId": 101,
+        "resourceType": "Medical Supplies",
+        "quantity": 100,
+        "status": "In Stock"
+      },
+      "502": {
+        "disasterId": 102,
+        "resourceType": "Water Bottles",
+        "quantity": 500,
+        "status": "In Stock"
+      },
+      "503": {
+        "disasterId": 103,
+        "resourceType": "Food Packages",
+        "quantity": 300,
+        "status": "In Stock"
+      }
+    },
+    "transportation": {
+      "601": {
+        "disasterId": 101,
+        "vehicleType": "Bus",
+        "capacity": 50,
+        "location": "Brooklyn, New York"
+      },
+      "602": {
+        "disasterId": 102,
+        "vehicleType": "Helicopter",
+        "capacity": 10,
+        "location": "Los Angeles Downtown"
+      },
+      "603": {
+        "disasterId": 103,
+        "vehicleType": "Truck",
+        "capacity": 30,
+        "location": "San Francisco"
+      }
+    },
+    "tasks": {
+      "701": {
+        "volunteerId": 301,
+        "disasterId": 101,
+        "description": "Coordinate evacuation efforts for lower Manhattan."
+      },
+      "702": {
+        "volunteerId": 302,
+        "disasterId": 101,
+        "description": "Provide first aid and medical assistance to evacuees."
+      },
+      "703": {
+        "volunteerId": 303,
+        "disasterId": 102,
+        "description": "Fight fires in Northern Los Angeles."
+      },
+      "704": {
+        "volunteerId": 304,
+        "disasterId": 102,
+        "description": "Manage shelters and resources for evacuees."
+      },
+      "705": {
+        "volunteerId": 305,
+        "disasterId": 103,
+        "description": "Assist in rescue operations after the earthquake."
+      }
+    }
+  }
+  

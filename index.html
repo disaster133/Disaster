@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disaster Management System</title>
+    <style>
+        :root {
+            /* Light theme colors */
+            --bg-color: #f4f4f4;
+            --text-color: #000;
+            --header-bg-color: #ff6f61;
+            --card-bg-color: rgba(255, 255, 255, 0.1);
+            --inner-card-bg-color: rgba(0, 0, 0, 0.3);
+            --button-bg-color: #ff6f61;
+            --button-hover-bg-color: #ff3f31;
+            --footer-bg-color: #333;
+            --footer-text-color: #fff;
+        }
+
+        [data-theme="dark"] {
+            /* Dark theme colors */
+            --bg-color: #181818;
+            --text-color: #f4f4f4;
+            --header-bg-color: #333;
+            --card-bg-color: rgba(255, 255, 255, 0.1);
+            --inner-card-bg-color: rgba(255, 255, 255, 0.1);
+            --button-bg-color: #5b5fd2;
+            --button-hover-bg-color: #4a56d1;
+            --footer-bg-color: #111;
+            --footer-text-color: #888;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden; /* Prevent scrolling */
+        }
+
+        header {
+            background-color: var(--header-bg-color);
+            padding: 20px;
+            color: white;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            margin: 0;
+        }
+
+        .hero {
+            background-image: url('bg.webp'); /* Ensure correct path */
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-color);
+            position: relative;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .glass-card {
+            background: var(--card-bg-color); /* Outer glass card */
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .inner-glass-card {
+            background: var(--inner-card-bg-color); /* Inner glass card with more opacity */
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            padding: 50px;
+            max-width: 800px;
+            text-align: center;
+            position: absolute;
+            bottom: 350px;
+        }
+
+        .inner-glass-card h2 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .inner-glass-card p {
+            font-size: 1.1rem;
+            margin: 10px 0;
+        }
+
+        /* Volunteer and Citizen buttons */
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--button-bg-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            margin: 0 10px;
+        }
+
+        .cta-btn:hover {
+            background-color: var(--button-hover-bg-color);
+        }
+
+        /* Typing effect without blinking cursor */
+        .typing-effect {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            width: 100%;
+            max-width: 100%;
+            animation: typing 4s steps(40, end);
+        }
+
+        @keyframes typing {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+
+        /* Rain effect */
+        .rain-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .rain {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.6);
+            width: 2px;
+            height: 100px;
+            bottom: 100%;
+            animation: rain-fall 1s infinite linear;
+        }
+
+        @keyframes rain-fall {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100vh); }
+        }
+
+        .rain-container div:nth-child(1) { left: 10%; animation-duration: 0.9s; }
+        .rain-container div:nth-child(2) { left: 20%; animation-duration: 1.1s; }
+        .rain-container div:nth-child(3) { left: 30%; animation-duration: 0.8s; }
+        .rain-container div:nth-child(4) { left: 40%; animation-duration: 1.2s; }
+        .rain-container div:nth-child(5) { left: 50%; animation-duration: 0.7s; }
+        .rain-container div:nth-child(6) { left: 60%; animation-duration: 1s; }
+        .rain-container div:nth-child(7) { left: 70%; animation-duration: 1.1s; }
+        .rain-container div:nth-child(8) { left: 80%; animation-duration: 0.9s; }
+        .rain-container div:nth-child(9) { left: 90%; animation-duration: 1s; }
+
+        /* Thunder (lightning) effect */
+        .lightning {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+        }
+
+        @keyframes lightning-flash {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        /* Adjusting footer to fit within the page */
+        footer {
+            background-color: var(--footer-bg-color);
+            color: var(--footer-text-color);
+            text-align: center;
+            padding: 10px;
+            font-size: 0.9rem;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /* Theme toggle button */
+        .theme-toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px;
+            background-color: var(--button-bg-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <h1>Disaster Management System</h1>
+        </nav>
+        <!-- Theme toggle button -->
+        <button class="theme-toggle-btn" id="theme-toggle-btn">Dark Mode</button>
+    </header>
+
+    <section class="hero">
+        <!-- Rain effect -->
+        <div class="rain-container">
+            <div class="rain"></div>
+            <div class="rain"></div>
+            <div class="rain"></div>
+            <div class="rain"></div>
+            <div class="rain"></div>
+            <div class="rain"></div>
+            <div class="rain"></div>
+            <div class="rain"></div>
+            <div class="rain"></div>
+        </div>
+
+        <!-- Thunder effect -->
+        <div class="lightning" id="lightning"></div>
+        
+        <div class="glass-card">
+            <div class="inner-glass-card">
+                <h2>Be Prepared for Any Disaster</h2>
+                <!-- Typing effect safety message inside the card -->
+                <div class="typing-effect" id="typing-text"></div>
+                <!-- Broken text into two sentences for clarity -->
+                <p>Our disaster management system helps communities stay informed and prepared during emergencies.</p>
+                <p>Receive alerts, view evacuation plans, and access critical resources when you need them the most.</p>
+                <div class="button-container">
+                    <a href="#" class="cta-btn" id="volunteer-btn">Volunteer</a>
+                    <a href="#" class="cta-btn" id="citizen-btn">Citizen</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>Disaster Management System &copy; 2024. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggleBtn = document.getElementById('theme-toggle-btn');
+        const currentTheme = localStorage.getItem('theme') || 'light';
+
+        document.body.setAttribute('data-theme', currentTheme);
+        themeToggleBtn.textContent = currentTheme === 'dark' ? 'Light Mode' : 'Dark Mode';
+
+        themeToggleBtn.addEventListener('click', () => {
+            const newTheme = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', newTheme);
+            themeToggleBtn.textContent = newTheme === 'dark' ? 'Light Mode' : 'Dark Mode';
+            localStorage.setItem('theme', newTheme); // Save the theme preference
+        });
+
+        // Redirect to Volunteer login/signup page
+        document.getElementById('volunteer-btn').addEventListener('click', function() {
+            window.location.href = "volunteer.html"; // Replace with actual page
+        });
+
+        // Redirect to Citizen login/signup page
+        document.getElementById('citizen-btn').addEventListener('click', function() {
+            window.location.href = "citizen.html"; // Replace with actual page
+        });
+
+        // Typing effect safety messages
+        const safetyMessages = [
+            "Be Responsible",
+            "Be Safe, Stay Safe",
+            "Act Fast, Save Lives",
+            "Prepare, Don't Panic",
+            "Stay Calm in Chaos",
+            "Follow the Evacuation Plan",
+            "Help Those in Need",
+            "Be Alert, Be Aware",
+            "Stay Connected",
+            "Work Together for Safety"
+        ];
+
+        let index = 0;
+
+        function typeMessage() {
+            const typingText = document.getElementById('typing-text');
+            typingText.innerHTML = safetyMessages[index];
+            index = (index + 1) % safetyMessages.length; // Loop through messages
+        }
+
+        setInterval(typeMessage, 4000); // Change message every 4 seconds
+
+        // Initial message
+        typeMessage();
+
+        // Thunder (lightning) effect
+        function randomLightning() {
+            const lightning = document.getElementById('lightning');
+            setTimeout(() => {
+                lightning.style.display = 'block';
+                lightning.style.animation = 'lightning-flash 0.1s ease-in-out';
+                setTimeout(() => {
+                    lightning.style.display = 'none';
+                }, 100); // Lightning effect lasts for 100ms
+            }, Math.random() * 7000 + 2000); // Random intervals between 2 and 9 seconds
+        }
+
+        setInterval(randomLightning, 10000); // Keep triggering random lightning effects
+    </script>
+</body>
+</html>

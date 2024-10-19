@@ -1,0 +1,178 @@
+{
+  "disasters": {
+    "disaster1": {
+      "id": 1,
+      "date": "2024-10-01",
+      "description": "Major earthquake causing infrastructure damage.",
+      "location": "denton",
+      "name": "Earthquake in Denton",
+      "severity": "High",
+      "volunteerIds": [
+        "1bYMOYTK5iU2lVk6QzUvxg4m4zg2",
+        "Gq9nARnDL2bMbG2gdTAbHwvc74g1"
+      ]
+    },
+    "disaster2": {
+      "id": 2,
+      "date": "2024-10-15",
+      "description": "Flooding due to heavy rainfall.",
+      "location": "denton",
+      "name": "Flood in Denton",
+      "severity": "Moderate",
+      "volunteerIds": [
+        "Gq9nARnDL2bMbG2gdTAbHwvc74g1"
+      ]
+    }
+  },
+  "messages": {
+    "message1": {
+      "content": "How is the situation at Shelter 1?",
+      "disasterId": 1,
+      "fromVolunteerId": "1bYMOYTK5iU2lVk6QzUvxg4m4zg2",
+      "timestamp": "2024-10-01T11:00:00Z",
+      "toVolunteerId": "Gq9nARnDL2bMbG2gdTAbHwvc74g1"
+    },
+    "message2": {
+      "content": "We are running low on medical kits, need more supplies.",
+      "disasterId": 1,
+      "fromVolunteerId": "Gq9nARnDL2bMbG2gdTAbHwvc74g1",
+      "timestamp": "2024-10-01T11:10:00Z",
+      "toVolunteerId": "1bYMOYTK5iU2lVk6QzUvxg4m4zg2"
+    },
+    "message3": {
+      "content": "Shelter 2 is nearly full, can we send some people to Shelter 1?",
+      "disasterId": 2,
+      "fromVolunteerId": "Gq9nARnDL2bMbG2gdTAbHwvc74g1",
+      "timestamp": "2024-10-15T13:00:00Z",
+      "toVolunteerId": "1bYMOYTK5iU2lVk6QzUvxg4m4zg2"
+    }
+  },
+  "notifications": {
+    "notification1": {
+      "id": 1,
+      "message": "New task assigned: Manage Shelter",
+      "timestamp": "2024-10-01T09:00:00Z",
+      "volunteerId": "1bYMOYTK5iU2lVk6QzUvxg4m4zg2"
+    },
+    "notification2": {
+      "id": 2,
+      "message": "New task assigned: Citizen Check-In",
+      "timestamp": "2024-10-01T09:30:00Z",
+      "volunteerId": "Gq9nARnDL2bMbG2gdTAbHwvc74g1"
+    }
+  },
+  "resources": {
+    "resource1": {
+      "id": 1,
+      "disasterId": 1,
+      "location": "Denton Warehouse",
+      "quantity": 300,
+      "type": "Food Packets"
+    },
+    "resource2": {
+      "id": 2,
+      "disasterId": 2,
+      "location": "Denton Warehouse",
+      "quantity": 150,
+      "type": "Blankets"
+    },
+    "resource3": {
+      "id": 3,
+      "disasterId": 1,
+      "location": "Denton Warehouse",
+      "quantity": 80,
+      "type": "Medical Kits"
+    }
+  },
+  "shelters": {
+    "shelter1": {
+      "id": 1,
+      "capacity": 100,
+      "currentOccupancy": 55,
+      "disasterId": 1,
+      "location": "Denton - Shelter 1"
+    },
+    "shelter2": {
+      "id": 2,
+      "capacity": 150,
+      "currentOccupancy": 90,
+      "disasterId": 2,
+      "location": "Denton - Shelter 2"
+    }
+  },
+  "tasks": {
+    "task1": {
+      "id": 1,
+      "assignedVolunteerId": "1bYMOYTK5iU2lVk6QzUvxg4m4zg2",
+      "disasterId": 1,
+      "estimatedTime": "5 hours",
+      "name": "Manage Shelter",
+      "priority": "High",
+      "status": "In Progress"
+    },
+    "task2": {
+      "id": 2,
+      "assignedVolunteerId": "Gq9nARnDL2bMbG2gdTAbHwvc74g1",
+      "disasterId": 1,
+      "estimatedTime": "3 hours",
+      "name": "Citizen Check-In",
+      "priority": "Moderate",
+      "status": "Pending"
+    },
+    "task3": {
+      "id": 3,
+      "assignedVolunteerId": "Gq9nARnDL2bMbG2gdTAbHwvc74g1",
+      "disasterId": 2,
+      "estimatedTime": "2 hours",
+      "name": "Update Resources",
+      "priority": "Low",
+      "status": "Completed"
+    }
+  },
+  "users": {
+    "1bYMOYTK5iU2lVk6QzUvxg4m4zg2": {
+      "email": "teste@gmail.com",
+      "id": 1729143423,
+      "location": "denton",
+      "userType": "volunteer",
+      "username": "test123"
+    },
+    "Gq9nARnDL2bMbG2gdTAbHwvc74g1": {
+      "email": "test1@gmail.com",
+      "id": 1729144610,
+      "location": "denton",
+      "userType": "volunteer",
+      "username": "test1@123"
+    },
+    "iiBftaf8BNPPMARU7jnXHAkNe9z1": {
+      "email": "abcd@gmail.com",
+      "id": 1729143611,
+      "location": "denton",
+      "userType": "citizen",
+      "username": "abcd_user"
+    }
+  },
+  "volunteerAssignments": {
+    "assignment1": {
+      "disasterId": 1,
+      "taskIds": [
+        1
+      ],
+      "volunteerId": "1bYMOYTK5iU2lVk6QzUvxg4m4zg2"
+    },
+    "assignment2": {
+      "disasterId": 1,
+      "taskIds": [
+        2
+      ],
+      "volunteerId": "Gq9nARnDL2bMbG2gdTAbHwvc74g1"
+    },
+    "assignment3": {
+      "disasterId": 2,
+      "taskIds": [
+        3
+      ],
+      "volunteerId": "Gq9nARnDL2bMbG2gdTAbHwvc74g1"
+    }
+  }
+}

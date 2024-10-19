@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disaster Management Flow</title>
+
+    <!-- Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            background-color: #ff6f61;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .flow-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            padding: 40px;
+            overflow-x: auto;
+        }
+
+        .card {
+            background-color: white;
+            width: 250px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            cursor: pointer;
+            opacity: 0.5;
+        }
+
+        .card.active {
+            opacity: 1;
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 128, 128, 0.2);
+        }
+
+        .card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .card h3 {
+            margin-top: 15px;
+            font-size: 1.5rem;
+        }
+
+        .card:hover {
+            transform: scale(1.1);
+            box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 500px;
+            max-width: 90%;
+            position: relative;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        .modal-content .form-group {
+            margin-bottom: 15px;
+        }
+
+        .modal-content label {
+            font-weight: bold;
+            display: block;
+        }
+
+        .modal-content input, .modal-content select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .modal-content button {
+            background-color: #ff6f61;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .modal-content button:hover {
+            background-color: #ff3f31;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background-color: red;
+            color: white;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .close-modal:hover {
+            background-color: darkred;
+        }
+
+        .reset-btn {
+            background-color: #ff6f61;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+        }
+
+        .reset-btn:hover {
+            background-color: #ff3f31;
+        }
+
+        .submit-all {
+            background-color: #ff6f61;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .submit-all.active {
+            opacity: 1;
+            cursor: pointer;
+        }
+
+        .back-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            position: fixed;
+            bottom: 20px;
+            right: 120px;
+        }
+
+        .back-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        Create Disaster - Save Lives
+    </div>
+
+    <div class="flow-container">
+        <!-- Card 1: Create Disaster -->
+        <div class="card active" id="createDisasterCard">
+            <img src="images/disaster_image_1.jpg" alt="Create Disaster">
+            <h3>Create Disaster</h3>
+        </div>
+
+        <!-- Card 2: Create Evacuation Plan -->
+        <div class="card" id="createEvacuationCard">
+            <img src="images/evacuation_image_2.jpg" alt="Create Evacuation Plan">
+            <h3>Create Evacuation Plan</h3>
+        </div>
+
+        <!-- Card 3: Send Alert -->
+        <div class="card" id="sendAlertCard">
+            <img src="images/alert_image_3.jpg" alt="Send Alert">
+            <h3>Send Alert</h3>
+        </div>
+
+        <!-- Card 4: Create Shelters -->
+        <div class="card" id="createSheltersCard">
+            <img src="images/shelter_image_5.jpg" alt="Create Shelters">
+            <h3>Create Shelters</h3>
+        </div>
+
+        <!-- Card 5: Manage Resources -->
+        <div class="card" id="manageResourcesCard">
+            <img src="images/resources_image_6.jpg" alt="Manage Resources">
+            <h3>Manage Resources</h3>
+        </div>
+
+        <!-- Card 6: Manage Transportation -->
+        <div class="card" id="manageTransportCard">
+            <img src="images/transportation_image.jpg" alt="Manage Transportation">
+            <h3>Manage Transportation</h3>
+        </div>
+
+        <!-- Card 7: Assign Tasks to Volunteers -->
+        <div class="card" id="assignTasksCard">
+            <img src="images/task_image_7.jpg" alt="Assign Tasks">
+            <h3>Assign Tasks to Volunteers</h3>
+        </div>
+    </div>
+
+    <button class="reset-btn" id="resetBtn">Reset All</button>
+    <button class="submit-all" id="submitAllBtn">Submit All</button>
+    <button class="back-btn" onclick="window.location.href='admin.html';">Back</button>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <h2 id="modalTitle">Create Disaster</h2>
+            <form id="modalForm">
+                <div id="dynamicFields"></div>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+        import { getDatabase, ref, set, remove, get, child } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAj6Oqcr0eRbJg4M0hK9inAOLSmtHyjAVI",
+            authDomain: "dmse-9d4f8.firebaseapp.com",
+            databaseURL: "https://dmse-9d4f8-default-rtdb.firebaseio.com",
+            projectId: "dmse-9d4f8",
+            storageBucket: "dmse-9d4f8.appspot.com",
+            messagingSenderId: "219529746323",
+            appId: "1:219529746323:web:9aed2195ad73640924ba66"
+        };
+
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        let currentStep = 1;
+        let completedSteps = 0;
+        let disasterId = null; // Disaster ID derived from the name in Step 1
+
+        const modal = document.getElementById("modal");
+        const closeModalButton = document.getElementById("closeModal");
+        const modalTitle = document.getElementById("modalTitle");
+        const dynamicFields = document.getElementById("dynamicFields");
+        const modalForm = document.getElementById("modalForm");
+        const submitAllBtn = document.getElementById("submitAllBtn");
+
+        const steps = [
+            document.getElementById("createDisasterCard"),
+            document.getElementById("createEvacuationCard"),
+            document.getElementById("sendAlertCard"),
+            document.getElementById("createSheltersCard"),
+            document.getElementById("manageResourcesCard"),
+            document.getElementById("manageTransportCard"),
+            document.getElementById("assignTasksCard")
+        ];
+
+        // Disable submit all button initially
+        submitAllBtn.classList.remove("active");
+
+        function activateStep(stepIndex) {
+            steps.forEach((card, index) => {
+                card.classList.remove("active");
+                if (index <= stepIndex) {
+                    card.classList.add("active");
+                }
+            });
+
+            // Activate Submit All when all steps are completed
+            if (completedSteps === steps.length) {
+                submitAllBtn.classList.add("active");
+                submitAllBtn.style.cursor = 'pointer';
+                submitAllBtn.addEventListener('click', submitAllData);
+            } else {
+                submitAllBtn.classList.remove("active");
+                submitAllBtn.style.cursor = 'not-allowed';
+            }
+        }
+
+        steps.forEach((card, index) => {
+            card.addEventListener("click", () => {
+                if (index === currentStep - 1) {
+                    modalTitle.innerText = `Step ${currentStep}: ${card.querySelector("h3").innerText}`;
+                    showFormFields(currentStep);
+                    modal.style.display = "flex";
+                }
+            });
+        });
+
+        closeModalButton.addEventListener("click", function () {
+            modal.style.display = "none";
+        });
+
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        };
+
+        function showFormFields(step) {
+            dynamicFields.innerHTML = '';
+
+            if (step === 7) {
+                // Dynamically load volunteers for assigning tasks
+                loadVolunteersOptions().then(volunteers => {
+                    dynamicFields.innerHTML = `
+                        <div class="form-group">
+                            <label for="taskDescription">Task Description</label>
+                            <input type="text" id="taskDescription" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="volunteerId">Assign to Volunteer</label>
+                            <select id="volunteerId" required>
+                                ${volunteers.map(volunteer => `<option value="${volunteer.id}">${volunteer.name} (${volunteer.role})</option>`).join('')}
+                            </select>
+                        </div>`;
+                });
+            } else {
+                // Load other form fields (as implemented previously)
+                if (step === 1) {
+                    dynamicFields.innerHTML = `
+                        <div class="form-group">
+                            <label for="disasterName">Disaster Name</label>
+                            <input type="text" id="disasterName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="disasterType">Disaster Type</label>
+                            <input type="text" id="disasterType" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="disasterCity">City</label>
+                            <input type="text" id="disasterCity" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="disasterSeverity">Severity</label>
+                            <input type="number" id="disasterSeverity" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="startDate">Start Date</label>
+                            <input type="date" id="startDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="endDate">End Date</label>
+                            <input type="date" id="endDate" required>
+                        </div>`;
+                } else if (step === 2) {
+                    dynamicFields.innerHTML = `
+                        <div class="form-group">
+                            <label for="evacuationRequired">Evacuation Required</label>
+                            <select id="evacuationRequired" required>
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="evacuationPlanDescription">Evacuation Description</label>
+                            <input type="text" id="evacuationPlanDescription">
+                        </div>`;
+                } else if (step === 3) {
+                    dynamicFields.innerHTML = `
+                        <div class="form-group">
+                            <label for="alertMessage">Alert Message</label>
+                            <input type="text" id="alertMessage" required>
+                        </div>`;
+                } else if (step === 4) {
+                    dynamicFields.innerHTML = `
+                        <div class="form-group">
+                            <label for="shelterLocation">Shelter Location</label>
+                            <input type="text" id="shelterLocation" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="shelterCapacity">Shelter Capacity</label>
+                            <input type="number" id="shelterCapacity" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="shelterStatus">Shelter Status</label>
+                            <select id="shelterStatus" required>
+                                <option value="Available">Available</option>
+                                <option value="Full">Full</option>
+                            </select>
+                        </div>`;
+                } else if (step === 5) {
+                    dynamicFields.innerHTML = `
+                        <div class="form-group">
+                            <label for="resourceType">Resource Type</label>
+                            <input type="text" id="resourceType" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="resourceQuantity">Resource Quantity</label>
+                            <input type="number" id="resourceQuantity" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="resourceStatus">Resource Status</label>
+                            <select id="resourceStatus" required>
+                                <option value="In Stock">In Stock</option>
+                                <option value="Out of Stock">Out of Stock</option>
+                            </select>
+                        </div>`;
+                } else if (step === 6) {
+                    dynamicFields.innerHTML = `
+                        <div class="form-group">
+                            <label for="vehicleType">Transportation Type</label>
+                            <select id="vehicleType" required>
+                                <option value="Bus">Bus</option>
+                                <option value="Helicopter">Helicopter</option>
+                                <option value="Truck">Truck</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="transportCapacity">Capacity</label>
+                            <input type="number" id="transportCapacity" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="transportLocation">Location</label>
+                            <input type="text" id="transportLocation" required>
+                        </div>`;
+                }
+            }
+        }
+
+        async function loadVolunteersOptions() {
+            const volunteersRef = ref(db, 'volunteers');
+            try {
+                const snapshot = await get(volunteersRef);
+                if (snapshot.exists()) {
+                    const volunteers = snapshot.val();
+                    return Object.keys(volunteers).map(volunteerId => {
+                        const volunteer = volunteers[volunteerId];
+                        return {
+                            id: volunteerId,
+                            name: volunteer.name,
+                            role: volunteer.role
+                        };
+                    });
+                } else {
+                    alert("No volunteers found.");
+                    return [];
+                }
+            } catch (error) {
+                console.error("Error retrieving volunteers:", error);
+                return [];
+            }
+        }
+
+        modalForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+            const tempId = Date.now(); 
+            const tempRef = ref(db, `tempData/step${currentStep}/${tempId}`);
+
+            let data = {};
+            if (currentStep === 1) {
+                data = {
+                    name: document.getElementById("disasterName").value,
+                    type: document.getElementById("disasterType").value,
+                    city: document.getElementById("disasterCity").value,
+                    severity: document.getElementById("disasterSeverity").value,
+                    startDate: document.getElementById("startDate").value,
+                    endDate: document.getElementById("endDate").value
+                };
+                disasterId = tempId; // Use generated tempId as disasterId
+            } else {
+                data = { disasterId }; // Attach disasterId to all subsequent steps
+
+                if (currentStep === 2) {
+                    data = {
+                        ...data,
+                        evacuationRequired: document.getElementById("evacuationRequired").value === "true",
+                        description: document.getElementById("evacuationPlanDescription").value
+                    };
+                } else if (currentStep === 3) {
+                    data = {
+                        ...data,
+                        message: document.getElementById("alertMessage").value
+                    };
+                } else if (currentStep === 4) {
+                    data = {
+                        ...data,
+                        location: document.getElementById("shelterLocation").value,
+                        capacity: document.getElementById("shelterCapacity").value,
+                        status: document.getElementById("shelterStatus").value
+                    };
+                } else if (currentStep === 5) {
+                    data = {
+                        ...data,
+                        resourceType: document.getElementById("resourceType").value,
+                        quantity: document.getElementById("resourceQuantity").value,
+                        status: document.getElementById("resourceStatus").value
+                    };
+                } else if (currentStep === 6) {
+                    data = {
+                        ...data,
+                        vehicleType: document.getElementById("vehicleType").value,
+                        capacity: document.getElementById("transportCapacity").value,
+                        location: document.getElementById("transportLocation").value
+                    };
+                } else if (currentStep === 7) {
+                    data = {
+                        ...data,
+                        description: document.getElementById("taskDescription").value,
+                        volunteerId: document.getElementById("volunteerId").value
+                    };
+                }
+            }
+
+            set(tempRef, {
+                ...data,
+                createdAt: new Date().toISOString()
+            })
+            .then(() => {
+                alert(`Step ${currentStep} data stored successfully!`);
+                completedSteps++;
+                currentStep++;
+                activateStep(currentStep - 1);
+                modal.style.display = "none"; 
+            })
+            .catch((error) => {
+                console.error("Error storing data:", error);
+                alert(`Error: ${error.message}`);
+            });
+        });
+
+        document.getElementById("resetBtn").addEventListener("click", () => {
+            remove(ref(db, "tempData"))
+                .then(() => {
+                    alert("Flow reset successfully!");
+                    currentStep = 1;
+                    completedSteps = 0;
+                    activateStep(0);
+                })
+                .catch((error) => {
+                    console.error("Error resetting flow:", error);
+                });
+        });
+
+        function submitAllData() {
+            const tempRef = ref(db, 'tempData');
+            get(tempRef)
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        for (const stepKey in data) {
+                            for (const entryKey in data[stepKey]) {
+                                const entryData = data[stepKey][entryKey];
+                                let finalRef;
+
+                                // Determine which table to save the data to based on step
+                                if (stepKey === 'step1') {
+                                    finalRef = ref(db, `disasters/${entryKey}`);
+                                } else if (stepKey === 'step2') {
+                                    finalRef = ref(db, `evacuationPlans/${entryKey}`);
+                                } else if (stepKey === 'step3') {
+                                    finalRef = ref(db, `alerts/${entryKey}`);
+                                } else if (stepKey === 'step4') {
+                                    finalRef = ref(db, `shelters/${entryKey}`);
+                                } else if (stepKey === 'step5') {
+                                    finalRef = ref(db, `resources/${entryKey}`);
+                                } else if (stepKey === 'step6') {
+                                    finalRef = ref(db, `transportation/${entryKey}`);
+                                } else if (stepKey === 'step7') {
+                                    finalRef = ref(db, `tasks/${entryKey}`);
+                                }
+
+                                // Insert data into the respective final table
+                                set(finalRef, entryData)
+                                    .then(() => {
+                                        console.log(`Data from step ${stepKey} inserted successfully!`);
+                                    })
+                                    .catch((error) => {
+                                        console.error(`Error inserting data from step ${stepKey}:`, error);
+                                    });
+                            }
+                        }
+                        // Delete tempData after successful insertion
+                        remove(tempRef)
+                            .then(() => {
+                                alert("All data inserted into respective tables and temp data deleted successfully.");
+                            })
+                            .catch((error) => {
+                                console.error("Error deleting temp data:", error);
+                            });
+                    } else {
+                        alert("No data found to submit.");
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error retrieving temp data:", error);
+                });
+        }
+
+        activateStep(0);
+    </script>
+
+</body>
+
+</html>

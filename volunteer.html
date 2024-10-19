@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volunteer Dashboard - Disaster Management System</title>
+
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        .bg-custom-orange {
+            background-color: #f29c76;
+        }
+
+        .text-custom-blue {
+            color: #5b5fd2;
+        }
+
+        .sidebar-link {
+            color: #333;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-link.active {
+            background-color: #ff9a75;
+            color: white;
+            border-radius: 5px;
+        }
+
+        .message-box {
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: #fff;
+        }
+    </style>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+        import { getDatabase, ref, set, get, update, child, onValue, push } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "YOUR_FIREBASE_API_KEY_HERE",
+            authDomain: "dmse-9d4f8.firebaseapp.com",
+            databaseURL: "https://dmse-9d4f8-default-rtdb.firebaseio.com",
+            projectId: "dmse-9d4f8",
+            storageBucket: "dmse-9d4f8.appspot.com",
+            messagingSenderId: "219529746323",
+            appId: "1:219529746323:web:9aed2195ad73640924ba66",
+            measurementId: "G-BMQNH87EMJ"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+
+        let loggedInVolunteerName = '';
+
+        // Log out functionality
+        window.logout = function () {
+            signOut(auth)
+                .then(() => {
+                    alert("Logged out successfully.");
+                    window.location.href = "index.html"; // Replace with the login page
+                })
+                .catch((error) => alert("Error logging out: " + error.message));
+        }
+
+        // Load assigned disasters for volunteer
+        function loadAssignedDisasters() {
+            const userId = sessionStorage.getItem("userId");
+            const contentArea = document.getElementById("contentArea");
+            contentArea.innerHTML = `
+                <h2 class="text-3xl font-semibold mb-6">Assigned Disasters</h2>
+                <div id="disasterList" class="space-y-4"></div>
+            `;
+
+            // Read disasters from database
+            get(child(ref(db), `assignedDisasters/${userId}`)).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const disasters = snapshot.val();
+                    let disasterListHTML = "";
+                    Object.keys(disasters).forEach((id) => {
+                        const disaster = disasters[id];
+                        disasterListHTML += `
+                            <div class="bg-white p-4 shadow rounded-lg cursor-pointer" onclick="loadAssignedTasks('${id}', '${disaster.name}')">
+                                <h3 class="text-lg font-semibold">${disaster.name}</h3>
+                                <p class="text-sm">${disaster.date}</p>
+                            </div>
+                        `;
+                    });
+                    document.getElementById("disasterList").innerHTML = disasterListHTML;
+                } else {
+                    document.getElementById("disasterList").innerHTML = "<p>No assigned disasters found.</p>";
+                }
+            }).catch((error) => {
+                alert("Error retrieving assigned disasters: " + error.message);
+            });
+        }
+
+        // Load assigned tasks for selected disaster
+        function loadAssignedTasks(disasterId, disasterName) {
+            const contentArea = document.getElementById("contentArea");
+            contentArea.innerHTML = `
+                <h2 class="text-3xl font-semibold mb-6">${disasterName} - Assigned Tasks</h2>
+                <div id="taskList" class="space-y-4"></div>
+            `;
+
+            get(child(ref(db), `assignedTasks/${disasterId}`)).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const tasks = snapshot.val();
+                    let taskListHTML = "";
+                    Object.keys(tasks).forEach((id) => {
+                        const task = tasks[id];
+                        taskListHTML += `
+                            <div class="bg-white p-4 shadow rounded-lg">
+                                <h3 class="text-lg font-semibold">${task.name}</h3>
+                                <p>Priority: ${task.priority}</p>
+                                <p>Status: ${task.status}</p>
+                                <p>Estimated Time: ${task.estimatedTime}</p>
+                                <div class="flex space-x-4 mt-4">
+                                    <button onclick="checkInCitizen('${disasterId}', '${task.name}')" class="bg-green-500 text-white px-4 py-2 rounded">Check In Citizen</button>
+                                    <button onclick="checkOutCitizen('${disasterId}', '${task.name}')" class="bg-yellow-500 text-white px-4 py-2 rounded">Check Out Citizen</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    document.getElementById("taskList").innerHTML = taskListHTML;
+                } else {
+                    document.getElementById("taskList").innerHTML = "<p>No assigned tasks found.</p>";
+                }
+            }).catch((error) => {
+                alert("Error retrieving assigned tasks: " + error.message);
+            });
+        }
+
+        // Function to check-in a citizen and update shelter space
+        function checkInCitizen(disasterId, taskName) {
+            const shelterRef = ref(db, `shelters/${disasterId}/${taskName}/availableSpaces`);
+            onValue(shelterRef, (snapshot) => {
+                let availableSpaces = snapshot.val();
+                if (availableSpaces > 0) {
+                    availableSpaces -= 1;
+                    update(shelterRef, { availableSpaces });
+                    alert("Citizen checked in. Updated available shelter spaces.");
+                } else {
+                    alert("No available spaces at this shelter.");
+                }
+            });
+        }
+
+        // Function to check-out a citizen and update shelter space
+        function checkOutCitizen(disasterId, taskName) {
+            const shelterRef = ref(db, `shelters/${disasterId}/${taskName}/availableSpaces`);
+            onValue(shelterRef, (snapshot) => {
+                let availableSpaces = snapshot.val();
+                availableSpaces += 1;
+                update(shelterRef, { availableSpaces });
+                alert("Citizen checked out. Updated available shelter spaces.");
+            });
+        }
+
+        // Load volunteer cards for messaging
+        function loadMessages() {
+            const contentArea = document.getElementById("contentArea");
+            contentArea.innerHTML = `
+                <h2 class="text-3xl font-semibold mb-6">Volunteer Messaging</h2>
+                <div id="volunteerList" class="grid grid-cols-3 gap-6 mb-8"></div>
+                <div id="messageBox" class="message-box"></div>
+                <div class="mt-4" id="messageInputSection" style="display: none;">
+                    <input type="text" id="messageInput" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Type your message here...">
+                    <button onclick="sendMessage()" class="bg-custom-orange text-white px-4 py-2 rounded-md mt-2">Send</button>
+                </div>
+            `;
+
+            const disasterId = sessionStorage.getItem('assignedDisasterId'); // assuming disasterId is stored in session when volunteer logs in
+            get(child(ref(db), `assignedVolunteers/${disasterId}`)).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const volunteers = snapshot.val();
+                    let volunteerListHTML = "";
+                    Object.keys(volunteers).forEach((id) => {
+                        const volunteer = volunteers[id];
+                        volunteerListHTML += `
+                            <div class="bg-white p-4 shadow rounded-lg cursor-pointer" onclick="loadChatBox('${id}', '${volunteer.name}')">
+                                <h3 class="text-lg font-semibold">${volunteer.name}</h3>
+                            </div>
+                        `;
+                    });
+                    document.getElementById("volunteerList").innerHTML = volunteerListHTML;
+                } else {
+                    document.getElementById("volunteerList").innerHTML = "<p>No volunteers assigned to this disaster.</p>";
+                }
+            }).catch((error) => {
+                alert("Error retrieving volunteers: " + error.message);
+            });
+        }
+
+        // Load chat box for selected volunteer
+        function loadChatBox(volunteerId, volunteerName) {
+            document.getElementById("messageInputSection").style.display = "block";
+            const messageBox = document.getElementById("messageBox");
+            messageBox.innerHTML = `<h3 class="text-lg font-semibold mb-4">Chat with ${volunteerName}</h3>`;
+
+            const messageRef = ref(db, `volunteerMessages/${volunteerId}`);
+            onValue(messageRef, (snapshot) => {
+                messageBox.innerHTML = `<h3 class="text-lg font-semibold mb-4">Chat with ${volunteerName}</h3>`;
+                if (snapshot.exists()) {
+                    const messages = snapshot.val();
+                    Object.keys(messages).forEach((key) => {
+                        const message = messages[key];
+                        messageBox.innerHTML += `<p><strong>${message.sender}:</strong> ${message.text}</p>`;
+                    });
+                }
+            });
+        }
+
+        // Send a message in the chat
+        function sendMessage() {
+            const volunteerId = sessionStorage.getItem("userId");
+            const recipientId = sessionStorage.getItem("currentChatVolunteerId");
+            const messageText = document.getElementById("messageInput").value;
+
+            if (messageText.trim() !== "") {
+                const newMessageRef = push(ref(db, `volunteerMessages/${recipientId}`));
+                set(newMessageRef, {
+                    sender: volunteerId,
+                    text: messageText,
+                    timestamp: Date.now()
+                }).then(() => {
+                    document.getElementById("messageInput").value = "";
+                }).catch((error) => {
+                    alert("Error sending message: " + error.message);
+                });
+            }
+        }
+
+        // Make the functions globally accessible
+        window.loadAssignedDisasters = loadAssignedDisasters;
+        window.loadAssignedTasks = loadAssignedTasks;
+        window.checkInCitizen = checkInCitizen;
+        window.checkOutCitizen = checkOutCitizen;
+        window.loadMessages = loadMessages;
+        window.loadChatBox = loadChatBox;
+        window.sendMessage = sendMessage;
+        window.logout = logout;
+
+        // Load home page initially
+        document.addEventListener("DOMContentLoaded", () => {
+            const userId = sessionStorage.getItem("userId");
+            get(child(ref(db), `users/${userId}`)).then((snapshot) => {
+                if (snapshot.exists()) {
+                    loggedInVolunteerName = snapshot.val().username;
+                    document.getElementById("volunteerName").textContent = `Welcome, ${loggedInVolunteerName}!`;
+                }
+            }).catch((error) => {
+                alert("Error retrieving user data: " + error.message);
+            });
+            loadAssignedDisasters();
+        });
+    </script>
+</head>
+
+<body class="bg-gray-100">
+
+    <!-- Navigation Sidebar -->
+    <div class="flex">
+        <div class="w-1/5 bg-gray-200 p-6">
+            <h2 class="text-center text-2xl font-semibold mb-6">DMS</h2>
+            <a href="#" onclick="loadAssignedDisasters()" class="sidebar-link active">Assigned Disasters</a>
+            <a href="#" onclick="loadMessages()" class="sidebar-link">Messages</a>
+            <button onclick="logout()" class="block w-full py-2 px-4 bg-red-500 text-white rounded-md mt-6 text-center">Log Out</button>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="w-4/5 p-6" id="contentArea">
+            <!-- Content will be dynamically loaded here -->
+            <h2 class="text-3xl font-semibold mb-6" id="volunteerName"></h2>
+            <p>Select an option from the sidebar to get started.</p>
+        </div>
+    </div>
+
+</body>
+
+</html>

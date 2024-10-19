@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Disaster Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        .header {
+            text-align: center;
+            background-color: #ff6f61;
+            color: white;
+            padding: 40px 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin: 0;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 100px;
+            padding: 40px;
+            margin-left: 175PX;
+            margin-top: 125PX;
+        }
+
+        .card {
+            background-color: white;
+            width: 500Px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0px 6px 15px rgba(255, 0, 0, 0.4);
+        }
+
+        /* Fire animation */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 69, 0, 0.5);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: -1;
+        }
+
+        .card:hover::before {
+            opacity: 0.8;
+            animation: fireAnimation 1.5s infinite alternate;
+        }
+
+        @keyframes fireAnimation {
+            0% { box-shadow: 0 0 15px rgba(255, 69, 0, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(255, 165, 0, 0.5); }
+            100% { box-shadow: 0 0 15px rgba(255, 69, 0, 0.3); }
+        }
+
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff6f61;
+            margin-bottom: 10px;
+        }
+
+        .card-link {
+            background-color: #ff6f61;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .card-link:hover {
+            background-color: #ff3f31;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <div class="header">
+        <h1>Welcome Admin</h1>
+        <p>React Fast, Think Smart, and Save Lives</p>
+    </div>
+
+    <!-- Container for Cards -->
+    <div class="container">
+        <!-- Card 1: Add Disaster Details -->
+        <div class="card">
+            <img src="managedisaster.webp" alt="Disaster Management">
+            <div class="card-content">
+                <div class="card-title">Add Disaster Details</div>
+                <a href="adminadd.html" class="card-link">Go to Add</a>
+            </div>
+        </div>
+
+        <!-- Card 2: Manage Disaster Details -->
+        <div class="card">
+            <img src="adddisaster.webp" alt="Manage Disaster">
+            <div class="card-content">
+                <div class="card-title">Manage Disaster Details</div>
+                <a href="manageDisasters.html" class="card-link">Go to Manage</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
