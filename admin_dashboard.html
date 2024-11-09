@@ -1,21 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+  <!-- Meta Tags -->
   <meta charset="UTF-8">
+  <title>Admin Dashboard - Disaster Management System</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard - Disaster Management</title>
 
-  <!-- Tailwind CSS for styling -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Firebase SDK -->
-  <script type="module">
-    // Import the functions you need from the SDKs you need
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import { getDatabase, ref, set, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
-    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+  <!-- Font Awesome CSS -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
 
+  <!-- Custom Styles -->
+  <style>
+    /* Custom colors */
+    .bg-custom-orange {
+      background-color: #f28c4f;
+    }
+    .text-custom-blue {
+      color: #5b5fd2;
+    }
+    .button-orange {
+      background-color: #f28c4f;
+    }
+    .button-orange:hover {
+      background-color: #f17b3a;
+    }
+    .text-custom-light-gray {
+      color: #a1a1aa;
+    }
+    /* Active Navbar Highlight */
+    .active-nav {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 8px;
+      position: relative;
+    }
+    .modal-content h2 {
+      margin-top: 0;
+    }
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    /* Dark Mode */
+    .dark-mode {
+      background-color: #1a202c;
+      color: #a0aec0;
+    }
+    .dark-mode .bg-white {
+      background-color: #2d3748;
+    }
+    .dark-mode .text-black {
+      color: #a0aec0;
+    }
+    .dark-mode .border-gray-300 {
+      border-color: #4a5568;
+    }
+    /* Animation */
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+  <!-- Firebase Configuration -->
+  <script>
     // Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyAj6Oqcr0eRbJg4M0hK9inAOLSmtHyjAVI",
@@ -24,316 +124,496 @@
       projectId: "dmse-9d4f8",
       storageBucket: "dmse-9d4f8.appspot.com",
       messagingSenderId: "219529746323",
-      appId: "1:219529746323:web:9aed2195ad73640924ba66",
-      measurementId: "G-BMQNH87EMJ"
-    };
-
+      appId: "1:219529746323:web:9aed2195ad73640924ba66"
+  };
     // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const auth = getAuth(app);
-
-    // CRUD Operations Functions
-    function createRecord(path, data) {
-      const recordRef = push(ref(db, path));
-      set(recordRef, data)
-        .then(() => {
-          alert(`${path} record added successfully!`);
-          closeModal('addModal');
-        })
-        .catch((error) => alert(`Error adding record: ${error.message}`));
-    }
-
-    function readRecords(path, callback) {
-      const refPath = ref(db, path);
-      onValue(refPath, (snapshot) => {
-        const data = snapshot.val();
-        callback(data);
-      });
-    }
-
-    function updateRecord(path, id, data) {
-      const recordRef = ref(db, `${path}/${id}`);
-      update(recordRef, data)
-        .then(() => {
-          alert(`${path} record updated successfully!`);
-          closeModal('editModal');
-          loadCrudPage(path, `${path} Management`);
-        })
-        .catch((error) => alert(`Error updating record: ${error.message}`));
-    }
-
-    function deleteRecord(path, id) {
-      if (confirm(`Are you sure you want to delete this ${path} record?`)) {
-        const recordRef = ref(db, `${path}/${id}`);
-        remove(recordRef)
-          .then(() => {
-            alert(`${path} record deleted successfully.`);
-            loadCrudPage(path, `${path} Management`);
-          })
-          .catch((error) => alert(`Error deleting record: ${error.message}`));
-      }
-    }
-
-    // Load Home Page with Cards
-    function loadHomePage() {
-      const contentArea = document.getElementById('contentArea');
-      contentArea.innerHTML = `
-        <h2 class="text-3xl font-semibold mb-4">Disaster Management System</h2>
-        <div class="grid grid-cols-3 gap-6">
-          ${generateHomePageCards()}
-        </div>
-      `;
-    }
-
-    function generateHomePageCards() {
-      const entities = [
-        { id: 'disasters', label: 'Disaster Management', image: 'https://via.placeholder.com/150' },
-        { id: 'tasks', label: 'Task Management', image: 'https://via.placeholder.com/150' },
-        { id: 'volunteers', label: 'Volunteer Management', image: 'https://via.placeholder.com/150' },
-        { id: 'shelters', label: 'Shelter Management', image: 'https://via.placeholder.com/150' },
-        { id: 'resources', label: 'Resource Management', image: 'https://via.placeholder.com/150' },
-        { id: 'transportations', label: 'Transportation Management', image: 'https://via.placeholder.com/150' }
-      ];
-
-      return entities.map(entity => `
-        <div class="bg-white p-4 shadow rounded-lg cursor-pointer" onclick="loadCrudPage('${entity.id}', '${entity.label}')">
-          <img src="${entity.image}" alt="${entity.label}" class="w-full h-32 object-cover rounded-md mb-4">
-          <h3 class="text-lg font-semibold">${entity.label}</h3>
-        </div>
-      `).join('');
-    }
-
-    // Load Form to Add New Records using Modal Popup
-    function loadForm(entity, formTitle) {
-      const modalContent = `
-        <div class="fixed z-10 inset-0 overflow-y-auto" id="addModal">
-          <div class="flex items-center justify-center min-h-screen">
-            <div class="bg-white rounded-lg shadow-lg p-6 w-1/2">
-              <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-semibold">${formTitle}</h3>
-                <button class="text-gray-500 hover:text-gray-700" onclick="closeModal('addModal')">✖</button>
-              </div>
-              <form id="${entity}Form" class="space-y-4">
-                <div id="dynamicFields"></div>
-                <button type="submit" class="bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600">Submit</button>
-              </form>
-            </div>
-          </div>
-        </div>
-      `;
-      document.body.insertAdjacentHTML('beforeend', modalContent);
-
-      // Define form fields based on entity type
-      const formFields = {
-        disasters: [
-          { id: "name", label: "Name", type: "text" },
-          { id: "date", label: "Date", type: "date" },
-          { id: "severity", label: "Severity", type: "dropdown", options: ["Low", "Moderate", "High"] }
-        ],
-        tasks: [
-          { id: "name", label: "Task Name", type: "text" },
-          { id: "assignedTo", label: "Assigned To", type: "text" },
-          { id: "status", label: "Status", type: "dropdown", options: ["Pending", "In Progress", "Completed"] }
-        ],
-        volunteers: [
-          { id: "name", label: "Volunteer Name", type: "text" },
-          { id: "contact", label: "Contact Number", type: "text" },
-          { id: "assignedDisaster", label: "Assigned Disaster", type: "text" }
-        ],
-        transportations: [
-          { id: "capacity", label: "Capacity", type: "number" },
-          { id: "disasterId", label: "Disaster ID", type: "number" },
-          { id: "location", label: "Location", type: "text" },
-          { id: "vehicleType", label: "Vehicle Type", type: "text" }
-        ]
-      };
-
-      const entityFields = formFields[entity];
-      const dynamicFields = document.getElementById('dynamicFields');
-
-      entityFields.forEach(field => {
-        if (field.type === "dropdown") {
-          dynamicFields.innerHTML += `
-            <div class="mb-4">
-              <label for="${field.id}" class="block text-sm font-medium">${field.label}</label>
-              <select id="${field.id}" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
-                ${field.options.map(option => `<option value="${option}">${option}</option>`).join('')}
-              </select>
-            </div>
-          `;
-        } else {
-          dynamicFields.innerHTML += `
-            <div class="mb-4">
-              <label for="${field.id}" class="block text-sm font-medium">${field.label}</label>
-              <input type="${field.type}" id="${field.id}" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required>
-            </div>
-          `;
-        }
-      });
-
-      document.getElementById(`${entity}Form`).addEventListener('submit', (e) => {
-        e.preventDefault();
-        const data = {};
-        dynamicFields.querySelectorAll('input, select').forEach(field => {
-          data[field.id] = field.value;
-        });
-
-        createRecord(entity, data);
-      });
-    }
-
-    function closeModal(modalId) {
-      const modal = document.getElementById(modalId);
-      if (modal) {
-        modal.remove();
-      }
-    }
-
-    // Load CRUD Page
-    function loadCrudPage(entity, title) {
-      const contentArea = document.getElementById('contentArea');
-      contentArea.innerHTML = `
-        <h2 class="text-3xl font-semibold mb-4">${title}</h2>
-        <button class="bg-green-500 text-white px-4 py-2 rounded mb-4" onclick="loadForm('${entity}', 'Add ${title}')">Add ${title}</button>
-        <div class="bg-white p-4 shadow rounded-lg mt-6">
-          <table class="min-w-full bg-white">
-            <thead>
-              <tr id="${entity}TableHeaders"></tr>
-            </thead>
-            <tbody id="${entity}TableBody"></tbody>
-          </table>
-        </div>
-      `;
-
-      // Use the correct Firebase path
-      readRecords(entity === 'transportations' ? 'transportation' : entity, (data) => {
-        const tableHeaders = document.getElementById(`${entity}TableHeaders`);
-        const tableBody = document.getElementById(`${entity}TableBody`);
-        tableBody.innerHTML = '';
-
-        if (data) {
-          let firstRecord = true;
-
-          Object.keys(data).forEach(id => {
-            const record = data[id];
-
-            if (firstRecord) {
-              // Create headers dynamically
-              tableHeaders.innerHTML = `
-                <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-semibold text-gray-700">ID</th>
-                ${Object.keys(record).map(field => `<th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-semibold text-gray-700">${field}</th>`).join('')}
-                <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-semibold text-gray-700">Actions</th>
-              `;
-              firstRecord = false;
-            }
-
-            tableBody.innerHTML += `
-              <tr>
-                <td class="px-6 py-2">${id}</td>
-                ${Object.values(record).map(value => `<td class="px-6 py-2">${value}</td>`).join('')}
-                <td class="px-6 py-2">
-                  <button class="bg-yellow-500 text-white px-3 py-1 rounded mr-2" onclick="loadEditForm('${entity}', '${id}', ${JSON.stringify(record)})">Edit</button>
-                  <button class="bg-red-500 text-white px-3 py-1 rounded" onclick="deleteRecord('${entity}', '${id}')">Delete</button>
-                </td>
-              </tr>
-            `;
-          });
-        }
-      });
-    }
-
-    // Edit Record using Modal Popup
-    function loadEditForm(entity, id, record) {
-      const editModal = `
-        <div class="fixed z-10 inset-0 overflow-y-auto" id="editModal">
-          <div class="flex items-center justify-center min-h-screen">
-            <div class="bg-white rounded-lg shadow-lg p-6 w-1/2">
-              <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-semibold">Edit ${entity}</h3>
-                <button class="text-gray-500 hover:text-gray-700" onclick="closeModal('editModal')">✖</button>
-              </div>
-              <form id="editForm" class="space-y-4">
-                <div id="editDynamicFields"></div>
-                <button type="submit" class="bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600">Update</button>
-              </form>
-            </div>
-          </div>
-        </div>
-      `;
-      document.body.insertAdjacentHTML('beforeend', editModal);
-
-      const editDynamicFields = document.getElementById('editDynamicFields');
-
-      Object.keys(record).forEach(key => {
-        if (key !== 'id') {
-          editDynamicFields.innerHTML += `
-            <div class="mb-4">
-              <label for="edit_${key}" class="block text-sm font-medium">${key}</label>
-              <input type="text" id="edit_${key}" value="${record[key]}" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
-            </div>
-          `;
-        }
-      });
-
-      document.getElementById('editForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const updatedData = {};
-        Object.keys(record).forEach(key => {
-          if (key !== 'id') {
-            updatedData[key] = document.getElementById(`edit_${key}`).value;
-          }
-        });
-        updateRecord(entity, id, updatedData);
-      });
-    }
-
-    // Logout Function
-    function logout() {
-      signOut(auth)
-        .then(() => {
-          alert('Logged out successfully.');
-          window.location.href = "login.html"; // Replace with the actual login page
-        })
-        .catch((error) => alert(`Error logging out: ${error.message}`));
-    }
-
-    // Make the functions globally accessible
-    window.loadHomePage = loadHomePage;
-    window.loadForm = loadForm;
-    window.loadCrudPage = loadCrudPage;
-    window.deleteRecord = deleteRecord;
-    window.loadEditForm = loadEditForm;
-    window.closeModal = closeModal;
-    window.logout = logout;
-
-    // Load home page initially
-    document.addEventListener("DOMContentLoaded", loadHomePage);
+    firebase.initializeApp(firebaseConfig);
   </script>
 </head>
-
-<body class="bg-gray-100">
-
-  <!-- Navigation Sidebar -->
-  <div class="flex">
-    <div class="w-1/5 bg-gray-200 p-6">
-      <h2 class="text-center text-2xl font-semibold mb-6">DMS</h2>
-      <a href="#" onclick="loadHomePage()" class="block py-2 px-4 bg-orange-500 text-white rounded-md mb-4 text-center">Home</a>
-      <a href="#" onclick="loadCrudPage('disasters', 'Disaster Management')" class="block py-2 px-4 text-gray-700 hover:bg-gray-300 rounded-md mb-4 text-center">Disaster Management</a>
-      <a href="#" onclick="loadCrudPage('tasks', 'Task Management')" class="block py-2 px-4 text-gray-700 hover:bg-gray-300 rounded-md mb-4 text-center">Task Management</a>
-      <a href="#" onclick="loadCrudPage('volunteers', 'Volunteer Management')" class="block py-2 px-4 text-gray-700 hover:bg-gray-300 rounded-md mb-4 text-center">Volunteer Management</a>
-      <a href="#" onclick="loadCrudPage('shelters', 'Shelter Management')" class="block py-2 px-4 text-gray-700 hover:bg-gray-300 rounded-md mb-4 text-center">Shelter Management</a>
-      <a href="#" onclick="loadCrudPage('resources', 'Resource Management')" class="block py-2 px-4 text-gray-700 hover:bg-gray-300 rounded-md mb-4 text-center">Resource Management</a>
-      <a href="#" onclick="loadCrudPage('transportations', 'Transportation Management')" class="block py-2 px-4 text-gray-700 hover:bg-gray-300 rounded-md mb-4 text-center">Transportation Management</a>
-      <button onclick="logout()" class="block w-full py-2 px-4 bg-red-500 text-white rounded-md mt-6 text-center">Logout</button>
-    </div>
-
-    <!-- Main Content Area -->
-    <div class="w-4/5 p-6" id="contentArea">
-      <!-- Content will be dynamically loaded here -->
+<body class="flex h-screen overflow-hidden transition-colors duration-500" id="body">
+  <!-- Sidebar -->
+  <div class="w-64 bg-custom-orange text-white flex flex-col">
+    <div class="p-4 text-2xl font-bold">Admin Dashboard</div>
+    <nav class="flex-1 px-2 py-4 space-y-2">
+      <a href="#" onclick="showSection('admins')" class="block px-4 py-2 rounded hover:bg-orange-600">Admins</a>
+      <a href="#" onclick="showSection('citizens')" class="block px-4 py-2 rounded hover:bg-orange-600">Citizens</a>
+      <a href="#" onclick="showSection('volunteers')" class="block px-4 py-2 rounded hover:bg-orange-600">Volunteers</a>
+      <a href="#" onclick="showSection('disasters')" class="block px-4 py-2 rounded hover:bg-orange-600">Disasters</a>
+      <a href="#" onclick="showSection('alerts')" class="block px-4 py-2 rounded hover:bg-orange-600">Alerts</a>
+      <a href="#" onclick="showSection('preventions')" class="block px-4 py-2 rounded hover:bg-orange-600">Preventions</a>
+      <a href="#" onclick="showSection('shelters')" class="block px-4 py-2 rounded hover:bg-orange-600">Shelters</a>
+      <a href="#" onclick="showSection('resources')" class="block px-4 py-2 rounded hover:bg-orange-600">Resources</a>
+      <a href="#" onclick="showSection('transportation')" class="block px-4 py-2 rounded hover:bg-orange-600">Transportation</a>
+      <a href="#" onclick="showSection('tasks')" class="block px-4 py-2 rounded hover:bg-orange-600">Tasks</a>
+    </nav>
+    <div class="p-4">
+      <button onclick="toggleDarkMode()" class="button-orange text-white w-full py-2 rounded mb-2">Toggle Dark Mode</button>
+      <button onclick="handleLogout()" class="button-orange text-white w-full py-2 rounded">Logout</button>
     </div>
   </div>
 
-</body>
+  <!-- Main Content -->
+  <div class="flex-1 bg-white p-6 overflow-auto transition-colors duration-500" id="mainContent">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold text-custom-blue" id="sectionTitle">Admins</h1>
+      <button onclick="openAddModal()" class="button-orange text-white px-4 py-2 rounded">Add New</button>
+    </div>
+    <!-- Data Table -->
+    <div id="dataTable">
+      <!-- Table will be dynamically inserted here -->
+    </div>
+  </div>
 
+  <!-- Add/Edit Modal -->
+  <div id="addEditModal" class="modal fade-in">
+    <div class="modal-content">
+      <span onclick="closeModal()" class="close">&times;</span>
+      <h2 class="text-xl font-bold mb-4" id="modalTitle">Add New</h2>
+      <form id="addEditForm">
+        <!-- Form fields will be dynamically inserted here -->
+        <button type="submit" class="button-orange text-white px-4 py-2 rounded mt-4">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="deleteModal" class="modal fade-in">
+    <div class="modal-content">
+      <span onclick="closeDeleteModal()" class="close">&times;</span>
+      <h2 class="text-xl font-bold mb-4">Confirm Delete</h2>
+      <p>Are you sure you want to delete this item?</p>
+      <div class="mt-4">
+        <button onclick="confirmDelete()" class="button-orange text-white px-4 py-2 rounded">Yes, Delete</button>
+        <button onclick="closeDeleteModal()" class="ml-2 button-orange text-white px-4 py-2 rounded">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main JavaScript -->
+  <script>
+    // Global Variables
+    let currentSection = 'admins';
+    let editId = null;
+    let deleteId = null;
+    let darkMode = false;
+
+    // Initialize after DOM is loaded
+    window.addEventListener('DOMContentLoaded', () => {
+      // Check admin session (implement your own authentication logic)
+      const isAdminLoggedIn = true; // Replace with actual session check
+      if (!isAdminLoggedIn) {
+        window.location.href = "admin_login.html"; // Redirect to login page
+        return;
+      }
+
+      showSection(currentSection);
+    });
+
+    // Logout Function
+    function handleLogout() {
+      // Clear session storage and redirect to login page
+      sessionStorage.clear();
+      window.location.href = "admin_login.html";
+    }
+
+    // Toggle Dark Mode
+    function toggleDarkMode() {
+      darkMode = !darkMode;
+      const body = document.getElementById('body');
+      const mainContent = document.getElementById('mainContent');
+      if (darkMode) {
+        body.classList.add('dark-mode');
+        mainContent.classList.add('dark-mode');
+      } else {
+        body.classList.remove('dark-mode');
+        mainContent.classList.remove('dark-mode');
+      }
+    }
+
+    // Show Section
+    function showSection(section) {
+      currentSection = section;
+      document.getElementById('sectionTitle').innerText = capitalizeFirstLetter(section);
+      fetchData();
+    }
+
+    // Fetch Data
+    function fetchData() {
+      firebase.database().ref(currentSection).once('value').then(snapshot => {
+        const data = snapshot.val();
+        displayData(data);
+      }).catch(error => {
+        console.error("Error fetching data:", error);
+      });
+    }
+
+    // Display Data
+    function displayData(data) {
+      const dataTable = document.getElementById('dataTable');
+      dataTable.innerHTML = '';
+
+      if (!data) {
+        dataTable.innerHTML = '<p>No data available.</p>';
+        return;
+      }
+
+      const table = document.createElement('table');
+      table.className = 'min-w-full bg-white dark:bg-gray-800';
+
+      // Table Header
+      const thead = document.createElement('thead');
+      thead.innerHTML = generateTableHeader(data);
+      table.appendChild(thead);
+
+      // Table Body
+      const tbody = document.createElement('tbody');
+      tbody.innerHTML = generateTableBody(data);
+      table.appendChild(tbody);
+
+      dataTable.appendChild(table);
+    }
+
+    // Generate Table Header
+    function generateTableHeader(data) {
+      const firstItem = data[Object.keys(data)[0]];
+      let headerHTML = '<tr>';
+      for (let key in firstItem) {
+        if (typeof firstItem[key] !== 'object') {
+          headerHTML += `<th class="px-4 py-2 border">${capitalizeFirstLetter(key)}</th>`;
+        }
+      }
+      headerHTML += '<th class="px-4 py-2 border">Actions</th>';
+      headerHTML += '</tr>';
+      return headerHTML;
+    }
+
+    // Generate Table Body
+    function generateTableBody(data) {
+      let bodyHTML = '';
+      for (let id in data) {
+        const item = data[id];
+        bodyHTML += '<tr>';
+        for (let key in item) {
+          if (typeof item[key] !== 'object') {
+            bodyHTML += `<td class="px-4 py-2 border">${item[key]}</td>`;
+          } else {
+            bodyHTML += `<td class="px-4 py-2 border">${JSON.stringify(item[key])}</td>`;
+          }
+        }
+        bodyHTML += `
+          <td class="px-4 py-2 border">
+            <button onclick="editItem('${id}')" class="text-blue-500 hover:text-blue-700 mr-2"><i class="fas fa-edit"></i></button>
+            <button onclick="openDeleteModal('${id}')" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
+          </td>
+        `;
+        bodyHTML += '</tr>';
+      }
+      return bodyHTML;
+    }
+
+    // Capitalize First Letter
+    function capitalizeFirstLetter(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    // Open Add/Edit Modal
+    function openAddModal() {
+      editId = null;
+      document.getElementById('modalTitle').innerText = `Add New ${capitalizeFirstLetter(currentSection.slice(0, -1))}`;
+      generateFormFields();
+      document.getElementById('addEditModal').style.display = 'block';
+    }
+
+    // Close Modal
+    function closeModal() {
+      document.getElementById('addEditModal').style.display = 'none';
+    }
+
+    // Generate Form Fields
+    function generateFormFields(item = {}) {
+      const form = document.getElementById('addEditForm');
+      form.innerHTML = '';
+      form.onsubmit = handleFormSubmit;
+
+      // Define form fields based on current section
+      let fields = [];
+      let idField = ''; // To store the ID field name
+      switch (currentSection) {
+        case 'admins':
+          idField = 'adminId';
+          fields = ['username', 'password'];
+          break;
+        case 'citizens':
+          idField = 'userId';
+          fields = ['email', 'password', 'name', 'city', 'phoneNumber', 'checkInStatus', 'currentDisasterId'];
+          break;
+        case 'volunteers':
+          idField = 'volunteerId';
+          fields = ['email', 'password', 'name', 'city', 'phoneNumber', 'assignedShelter', 'tasks'];
+          break;
+        case 'disasters':
+          idField = 'disasterId';
+          fields = ['name', 'city', 'type', 'description', 'severity', 'startDate', 'endDate', 'instructions', 'resourcesNeeded'];
+          break;
+        case 'alerts':
+          idField = 'alertId';
+          fields = ['city', 'date', 'disasterId', 'message', 'severity'];
+          break;
+        case 'preventions':
+          idField = 'preventionId';
+          fields = ['disasterId', 'city', 'title', 'description'];
+          break;
+        case 'shelters':
+          idField = 'shelterId';
+          fields = ['disasterId', 'city', 'location', 'capacity', 'currentOccupancy', 'status', 'contactInfo', 'resources'];
+          break;
+        case 'resources':
+          idField = 'resourceId';
+          fields = ['shelterId', 'resourceName', 'quantity'];
+          break;
+        case 'transportation':
+          idField = 'transportId';
+          fields = ['disasterId', 'city', 'vehicleType', 'capacity', 'currentOccupancy', 'availabilityStatus', 'pickupLocation', 'dropOffLocation', 'routeDetails'];
+          break;
+        case 'tasks':
+          idField = 'taskId';
+          fields = ['volunteerId', 'shelterId', 'description', 'status'];
+          break;
+        default:
+          break;
+      }
+
+      // If editing, include ID field as read-only
+      if (editId && idField) {
+        const label = document.createElement('label');
+        label.className = 'block mb-2';
+        label.innerText = capitalizeFirstLetter(idField);
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = idField;
+        input.value = item[idField] || '';
+        input.className = 'w-full border border-gray-300 rounded-md p-2 mb-4';
+        input.readOnly = true;
+
+        form.appendChild(label);
+        form.appendChild(input);
+      }
+
+      // Generate form inputs
+      fields.forEach(field => {
+        const label = document.createElement('label');
+        label.className = 'block mb-2';
+        label.innerText = capitalizeFirstLetter(field);
+
+        let input;
+        if (field === 'checkInStatus' || field === 'status' || field === 'availabilityStatus') {
+          // Dropdown for boolean or status fields
+          input = document.createElement('select');
+          input.name = field;
+          input.className = 'w-full border border-gray-300 rounded-md p-2 mb-4';
+          const options = field === 'checkInStatus' ? ['true', 'false'] : ['Available', 'Not Available', 'Pending', 'Completed'];
+          options.forEach(optionValue => {
+            const option = document.createElement('option');
+            option.value = optionValue;
+            option.text = optionValue;
+            if (item[field] === optionValue) {
+              option.selected = true;
+            }
+            input.appendChild(option);
+          });
+        } else if (field === 'tasks' || field === 'resourcesNeeded' || field === 'resources') {
+          // Textarea for arrays or objects
+          input = document.createElement('textarea');
+          input.name = field;
+          input.value = Array.isArray(item[field]) || typeof item[field] === 'object' ? JSON.stringify(item[field]) : item[field] || '';
+          input.className = 'w-full border border-gray-300 rounded-md p-2 mb-4';
+          input.rows = 3;
+          label.innerText += ' (JSON format)';
+        } else if (field.toLowerCase().includes('date')) {
+          // Date input for date fields
+          input = document.createElement('input');
+          input.type = 'date';
+          input.name = field;
+          input.value = item[field] || '';
+          input.className = 'w-full border border-gray-300 rounded-md p-2 mb-4';
+        } else if (field.toLowerCase().includes('password')) {
+          // Password input
+          input = document.createElement('input');
+          input.type = 'password';
+          input.name = field;
+          input.value = item[field] || '';
+          input.className = 'w-full border border-gray-300 rounded-md p-2 mb-4';
+        } else if (field.toLowerCase().includes('email')) {
+          // Email input
+          input = document.createElement('input');
+          input.type = 'email';
+          input.name = field;
+          input.value = item[field] || '';
+          input.className = 'w-full border border-gray-300 rounded-md p-2 mb-4';
+        } else if (field.toLowerCase().includes('severity') || field.toLowerCase().includes('capacity') || field.toLowerCase().includes('quantity') || field.toLowerCase().includes('currentoccupancy') || field.toLowerCase().includes('phone')) {
+          // Number input
+          input = document.createElement('input');
+          input.type = 'number';
+          input.name = field;
+          input.value = item[field] || '';
+          input.className = 'w-full border border-gray-300 rounded-md p-2 mb-4';
+        } else {
+          // Default to text input
+          input = document.createElement('input');
+          input.type = 'text';
+          input.name = field;
+          input.value = item[field] || '';
+          input.className = 'w-full border border-gray-300 rounded-md p-2 mb-4';
+        }
+
+        form.appendChild(label);
+        form.appendChild(input);
+      });
+
+      // Add the Save button
+      const saveButton = document.createElement('button');
+      saveButton.type = 'submit';
+      saveButton.className = 'button-orange text-white px-4 py-2 rounded mt-4';
+      saveButton.innerText = 'Save';
+
+      form.appendChild(saveButton);
+    }
+
+    // Handle Form Submit
+    function handleFormSubmit(event) {
+      event.preventDefault();
+      const formData = new FormData(event.target);
+      const data = {};
+      formData.forEach((value, key) => {
+        // Parse JSON fields
+        if (['tasks', 'resourcesNeeded', 'resources'].includes(key)) {
+          try {
+            data[key] = JSON.parse(value);
+          } catch (e) {
+            alert(`Invalid JSON format in ${key}`);
+            return;
+          }
+        } else if (value === 'true' || value === 'false') {
+          data[key] = value === 'true';
+        } else {
+          data[key] = value;
+        }
+      });
+
+      // Determine the ID field name
+      let idField = '';
+      switch (currentSection) {
+        case 'admins':
+          idField = 'adminId';
+          break;
+        case 'citizens':
+          idField = 'userId';
+          break;
+        case 'volunteers':
+          idField = 'volunteerId';
+          break;
+        case 'disasters':
+          idField = 'disasterId';
+          break;
+        case 'alerts':
+          idField = 'alertId';
+          break;
+        case 'preventions':
+          idField = 'preventionId';
+          break;
+        case 'shelters':
+          idField = 'shelterId';
+          break;
+        case 'resources':
+          idField = 'resourceId';
+          break;
+        case 'transportation':
+          idField = 'transportId';
+          break;
+        case 'tasks':
+          idField = 'taskId';
+          break;
+        default:
+          break;
+      }
+
+      // Save data to Firebase
+      if (editId) {
+        // Update existing item
+        firebase.database().ref(`${currentSection}/${editId}`).update(data).then(() => {
+          alert('Data updated successfully.');
+          closeModal();
+          fetchData();
+        }).catch(error => {
+          console.error('Error updating data:', error);
+        });
+      } else {
+        // Add new item with numeric ID
+        getNextId().then(newId => {
+          if (idField) {
+            data[idField] = newId;
+          }
+          firebase.database().ref(`${currentSection}/${newId}`).set(data).then(() => {
+            alert('Data added successfully.');
+            closeModal();
+            fetchData();
+          }).catch(error => {
+            console.error('Error adding data:', error);
+          });
+        });
+      }
+    }
+
+    // Get the next numeric ID
+    function getNextId() {
+      return firebase.database().ref(`${currentSection}Counter`).transaction(currentValue => {
+        return (currentValue || 0) + 1;
+      }).then(result => {
+        return result.snapshot.val();
+      }).catch(error => {
+        console.error('Error getting next ID:', error);
+        return Date.now(); // Fallback to timestamp if error
+      });
+    }
+
+    // Edit Item
+    function editItem(id) {
+      editId = id;
+      firebase.database().ref(`${currentSection}/${id}`).once('value').then(snapshot => {
+        const item = snapshot.val();
+        document.getElementById('modalTitle').innerText = `Edit ${capitalizeFirstLetter(currentSection.slice(0, -1))}`;
+        generateFormFields(item);
+        document.getElementById('addEditModal').style.display = 'block';
+      }).catch(error => {
+        console.error('Error fetching item data:', error);
+      });
+    }
+
+    // Open Delete Modal
+    function openDeleteModal(id) {
+      deleteId = id;
+      document.getElementById('deleteModal').style.display = 'block';
+    }
+
+    // Close Delete Modal
+    function closeDeleteModal() {
+      deleteId = null;
+      document.getElementById('deleteModal').style.display = 'none';
+    }
+
+    // Confirm Delete
+    function confirmDelete() {
+      if (deleteId) {
+        firebase.database().ref(`${currentSection}/${deleteId}`).remove().then(() => {
+          alert('Data deleted successfully.');
+          closeDeleteModal();
+          fetchData();
+        }).catch(error => {
+          console.error('Error deleting data:', error);
+        });
+      }
+    }
+  </script>
+</body>
 </html>

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Meta Tags -->
+  <meta charset="UTF-8">
+  <title>Chatbot - Disaster Management System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome CSS -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <!-- Custom Styles -->
+  <style>
+    /* Custom colors */
+    .bg-custom-orange {
+      background-color: #f28c4f;
+    }
+    .text-custom-blue {
+      color: #5b5fd2;
+    }
+    .button-orange {
+      background-color: #f28c4f;
+    }
+    .button-orange:hover {
+      background-color: #f17b3a;
+    }
+    .text-custom-light-gray {
+      color: #a1a1aa;
+    }
+    /* Chatbot Styles */
+    .chatbot-window {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: white;
+      border: 1px solid #ced4da;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 1000;
+      height: 80vh;
+    }
+
+    .chatbot-header {
+      background-color: #5b5fd2; /* Medium Blue */
+      color: white;
+      padding: 10px;
+      text-align: center;
+      position: relative;
+    }
+
+    .chatbot-body {
+      padding: 10px;
+      overflow-y: auto;
+      flex-grow: 1;
+      background-color: #f9f9f9;
+    }
+
+    .chatbot-footer {
+      padding: 10px;
+      border-top: 1px solid #ced4da;
+    }
+
+    .chat-message {
+      margin-bottom: 10px;
+    }
+
+    .chat-message.user {
+      text-align: right;
+    }
+
+    .chat-message.bot {
+      text-align: left;
+    }
+
+    .chat-message p {
+      display: inline-block;
+      padding: 10px;
+      border-radius: 10px;
+      max-width: 80%;
+    }
+
+    .chat-message.user p {
+      background-color: #5b5fd2; /* Medium Blue */
+      color: white;
+    }
+
+    .chat-message.bot p {
+      background-color: #e2e8f0; /* Light gray */
+      color: black;
+    }
+
+    /* Suggested Questions Styles */
+    .suggested-questions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .suggested-question {
+      background-color: #f28c4f;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .suggested-question:hover {
+      background-color: #f17b3a;
+    }
+
+    /* Active Navbar Highlight */
+    .active-nav {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+  </style>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+  <!-- Firebase Configuration -->
+  <script>
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    var firebaseConfig = {
+      apiKey: "AIzaSyAj6Oqcr0eRbJg4M0hK9inAOLSmtHyjAVI",
+      authDomain: "dmse-9d4f8.firebaseapp.com",
+      databaseURL: "https://dmse-9d4f8-default-rtdb.firebaseio.com",
+      projectId: "dmse-9d4f8",
+      storageBucket: "dmse-9d4f8.firebasestorage.app",
+      messagingSenderId: "219529746323",
+      appId: "1:219529746323:web:9aed2195ad73640924ba66",
+      measurementId: "G-BMQNH87EMJ"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+  </script>
+</head>
+<body class="flex h-screen overflow-hidden">
+  <!-- Sidebar -->
+  <div class="w-64 bg-custom-orange text-white flex flex-col">
+    <div class="p-4 text-2xl font-bold">Dashboard</div>
+    <nav class="flex-1 px-2 py-4 space-y-2">
+      <a href="users_dashboard.html" class="block px-4 py-2 rounded hover:bg-orange-600">Dashboard</a>
+      <a href="users_disaster.html" class="block px-4 py-2 rounded hover:bg-orange-600">My Disaster</a>
+      <a href="users_shelters.html" class="block px-4 py-2 rounded hover:bg-orange-600">Shelters</a>
+      <a href="users_transportations.html" class="block px-4 py-2 rounded hover:bg-orange-600">Transportation</a>
+      <a href="users_precautions.html" class="block px-4 py-2 rounded hover:bg-orange-600">Precautions</a>
+      <a href="users_chat.html" class="block px-4 py-2 rounded hover:bg-orange-600 active-nav">Chatbot</a>
+    </nav>
+    <div class="p-4">
+      <button onclick="handleLogout()" class="button-orange text-white w-full py-2 rounded">Logout</button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex-1 bg-white p-6 overflow-auto flex justify-center items-center">
+    <div class="chatbot-window flex flex-col" id="chatbotWindow">
+      <div class="chatbot-header">
+        <strong>Chatbot</strong>
+      </div>
+      <div class="chatbot-body flex-grow p-2" id="chatbotBody">
+        <!-- Chat messages will appear here -->
+      </div>
+      <div class="chatbot-footer p-2 border-t border-gray-300">
+        <div class="flex">
+          <input type="text" id="chatbotInput" class="flex-1 border border-gray-300 rounded-md p-2" placeholder="Type your message...">
+          <button onclick="handleUserInput()" class="button-orange text-white px-4 py-2 rounded-md ml-2">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main JavaScript -->
+  <script>
+    // Global Variables
+    let currentUser = null;
+    let userCity = null;
+    let currentDisasterId = null;
+
+    // Initialize the chatbot
+    window.addEventListener('DOMContentLoaded', () => {
+      // Check session storage
+      const userId = sessionStorage.getItem('userId');
+      if (!userId) {
+        window.location.href = "user_login.html";
+        return;
+      }
+
+      // Fetch user data
+      firebase.database().ref('citizens/' + userId).once('value').then(snapshot => {
+        currentUser = snapshot.val();
+        if (!currentUser) {
+          console.error("User data not found.");
+          window.location.href = "user_login.html";
+          return;
+        }
+        userCity = currentUser.city;
+        currentDisasterId = currentUser.currentDisasterId;
+        initChatbot(currentUser);
+      }).catch(error => {
+        console.error("Error fetching user data:", error);
+        window.location.href = "user_login.html";
+      });
+    });
+
+    function initChatbot(currentUser) {
+      const chatbotBody = document.getElementById('chatbotBody');
+      chatbotBody.innerHTML = '';
+      const greeting = `Hello, ${currentUser.name || 'User'}! How can I assist you today?`;
+      appendMessage('bot', greeting);
+      displaySuggestedQuestions();
+    }
+
+    function appendMessage(sender, message) {
+      const chatbotBody = document.getElementById('chatbotBody');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `chat-message ${sender}`;
+      messageDiv.innerHTML = `<p>${message}</p>`;
+      chatbotBody.appendChild(messageDiv);
+      chatbotBody.scrollTop = chatbotBody.scrollHeight;
+    }
+
+    function displaySuggestedQuestions() {
+      const chatbotBody = document.getElementById('chatbotBody');
+      const suggestedDiv = document.createElement('div');
+      suggestedDiv.className = "suggested-questions";
+      const suggestedQuestions = [
+        "Tell me about the current disasters.",
+        "Where are the shelters in my city?",
+        "What precautions should I take during a disaster?",
+        "How can I volunteer?",
+        "What safety tips should I follow?",
+        "How can I check in at a shelter?"
+      ];
+      suggestedQuestions.forEach(question => {
+        const button = document.createElement('div');
+        button.className = "suggested-question";
+        button.innerText = question;
+        button.onclick = () => {
+          handleUserInput(question);
+        };
+        suggestedDiv.appendChild(button);
+      });
+      chatbotBody.appendChild(suggestedDiv);
+      chatbotBody.scrollTop = chatbotBody.scrollHeight;
+    }
+
+    function handleUserInput(message) {
+      const userInput = message || document.getElementById('chatbotInput').value.trim();
+      if (!userInput) return;
+      appendMessage('user', userInput);
+      document.getElementById('chatbotInput').value = '';
+      getChatbotResponse(userInput.toLowerCase());
+    }
+
+    function getChatbotResponse(message) {
+      let response = '';
+
+      // Simple chatbot logic
+      if (message.includes('current disasters')) {
+        fetchCurrentDisasters();
+      } else if (message.includes('shelters')) {
+        fetchShelters();
+      } else if (message.includes('precautions')) {
+        fetchPrecautions();
+      } else if (message.includes('volunteer')) {
+        response = "To volunteer, please contact our volunteer coordinator at volunteer@example.com or visit the nearest disaster management office.";
+        appendMessage('bot', response);
+      } else if (message.includes('safety tips') || message.includes('safety')) {
+        fetchSafetyTips();
+      } else if (message.includes('check in') || message.includes('check-in')) {
+        response = "To check in at a shelter, please visit the shelter and provide your identification. Our staff will assist you with the process.";
+        appendMessage('bot', response);
+      } else {
+        response = "I'm sorry, I didn't understand that. Could you please rephrase or choose one of the suggested questions below?";
+        appendMessage('bot', response);
+        displaySuggestedQuestions();
+      }
+    }
+
+    function fetchCurrentDisasters() {
+      firebase.database().ref('disasters').once('value').then(snapshot => {
+        const disasters = snapshot.val();
+        let disasterList = '';
+        for (let disasterId in disasters) {
+          const disaster = disasters[disasterId];
+          disasterList += `${disaster.name} in ${disaster.city}. Severity: ${disaster.severity}. `;
+        }
+        const response = disasterList || "There are currently no active disasters.";
+        appendMessage('bot', response);
+      }).catch(error => {
+        console.error("Error fetching disasters:", error);
+        appendMessage('bot', "Sorry, I couldn't retrieve the disaster information at this time.");
+      });
+    }
+
+    function fetchShelters() {
+      if (!currentDisasterId) {
+        appendMessage('bot', "There is no active disaster assigned to you currently.");
+        return;
+      }
+      firebase.database().ref('shelters').once('value').then(snapshot => {
+        const shelters = snapshot.val();
+        let shelterList = '';
+        for (let shelterId in shelters) {
+          const shelter = shelters[shelterId];
+          if (shelter.disasterId === currentDisasterId && shelter.city.toLowerCase() === userCity.toLowerCase()) {
+            shelterList += `${shelter.location}: Capacity ${shelter.capacity}, Current Occupancy ${shelter.currentOccupancy}. `;
+          }
+        }
+        const response = shelterList || "There are currently no shelters available in your city.";
+        appendMessage('bot', response);
+      }).catch(error => {
+        console.error("Error fetching shelters:", error);
+        appendMessage('bot', "Sorry, I couldn't retrieve the shelter information at this time.");
+      });
+    }
+
+    function fetchPrecautions() {
+      if (!currentDisasterId) {
+        appendMessage('bot', "There is no active disaster assigned to you currently.");
+        return;
+      }
+      firebase.database().ref('preventions').once('value').then(snapshot => {
+        const preventions = snapshot.val();
+        let precautionList = '';
+        for (let preventionId in preventions) {
+          const prevention = preventions[preventionId];
+          if (prevention.disasterId === currentDisasterId && prevention.city.toLowerCase() === userCity.toLowerCase()) {
+            precautionList += `${prevention.title}: ${prevention.description} `;
+          }
+        }
+        const response = precautionList || "No specific precautions are available at this time.";
+        appendMessage('bot', response);
+      }).catch(error => {
+        console.error("Error fetching precautions:", error);
+        appendMessage('bot', "Sorry, I couldn't retrieve the precaution information at this time.");
+      });
+    }
+
+    function fetchSafetyTips() {
+      // Simple safety tips
+      const safetyTips = "Stay informed through official channels, have an emergency kit ready, and follow instructions from authorities.";
+      appendMessage('bot', safetyTips);
+    }
+
+    // Logout Function
+    function handleLogout() {
+      // Clear session storage and redirect to login page
+      sessionStorage.clear();
+      window.location.href = "user_login.html";
+    }
+  </script>
+</body>
+</html>

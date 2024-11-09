@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Meta Tags -->
+  <meta charset="UTF-8">
+  <title>Dashboard - Disaster Management System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome CSS -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <!-- Custom Styles -->
+  <style>
+    /* Custom colors */
+    .bg-custom-orange {
+      background-color: #f28c4f;
+    }
+    .text-custom-blue {
+      color: #5b5fd2;
+    }
+    .button-orange {
+      background-color: #f28c4f;
+    }
+    .button-orange:hover {
+      background-color: #f17b3a;
+    }
+    .text-custom-light-gray {
+      color: #a1a1aa;
+    }
+    /* Active Navbar Highlight */
+    .active-nav {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+  </style>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+  <!-- Firebase Configuration -->
+  <script>
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    var firebaseConfig = {
+      apiKey: "AIzaSyAj6Oqcr0eRbJg4M0hK9inAOLSmtHyjAVI",
+      authDomain: "dmse-9d4f8.firebaseapp.com",
+      databaseURL: "https://dmse-9d4f8-default-rtdb.firebaseio.com",
+      projectId: "dmse-9d4f8",
+      storageBucket: "dmse-9d4f8.firebasestorage.app",
+      messagingSenderId: "219529746323",
+      appId: "1:219529746323:web:9aed2195ad73640924ba66",
+      measurementId: "G-BMQNH87EMJ"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+  </script>
+</head>
+<body class="flex h-screen overflow-hidden">
+  <!-- Sidebar -->
+  <div class="w-64 bg-custom-orange text-white flex flex-col">
+    <div class="p-4 text-2xl font-bold">Dashboard</div>
+    <nav class="flex-1 px-2 py-4 space-y-2">
+      <a href="dashboard.html" class="block px-4 py-2 rounded hover:bg-orange-600 active-nav">Dashboard</a>
+      <a href="users_disaster.html" class="block px-4 py-2 rounded hover:bg-orange-600">My Disaster</a>
+      <a href="users_shelters.html" class="block px-4 py-2 rounded hover:bg-orange-600">Shelters</a>
+      <a href="users_transportations.html" class="block px-4 py-2 rounded hover:bg-orange-600">Transportation</a>
+      <a href="users_precautions.html" class="block px-4 py-2 rounded hover:bg-orange-600">Precautions</a>
+      <a href="users_chat.html" class="block px-4 py-2 rounded hover:bg-orange-600">Chatbot</a>
+    </nav>
+    <div class="p-4">
+      <button onclick="handleLogout()" class="button-orange text-white w-full py-2 rounded">Logout</button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex-1 bg-white p-6 overflow-auto">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold text-custom-blue">Welcome, <span id="welcomeUsername">User</span>!</h1>
+    </div>
+
+    <!-- Dashboard Summary -->
+    <section id="dashboard" class="mb-6">
+      <h2 class="text-2xl font-semibold text-custom-blue mb-4">Dashboard Summary</h2>
+      <!-- Alerts -->
+      <div id="alertContainer" class="mb-6">
+        <!-- Alerts will be dynamically inserted here -->
+      </div>
+      <!-- All Disasters -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="allDisasterCards">
+        <!-- Disaster cards will be dynamically inserted here -->
+      </div>
+    </section>
+  </div>
+
+  <!-- Main JavaScript -->
+  <script>
+    // Global Variables
+    let currentUser = null;
+    let currentDisaster = null;
+    let userCity = null;
+
+    // Initialize Dashboard after DOM is loaded
+    window.addEventListener('DOMContentLoaded', () => {
+      const userId = sessionStorage.getItem('userId');
+      if (!userId) {
+        window.location.href = "user_login.html"; // Redirect to login page
+        return;
+      }
+
+      // Fetch User Data
+      firebase.database().ref('citizens/' + userId).once('value').then(snapshot => {
+        currentUser = snapshot.val();
+        if (!currentUser) {
+          console.error("User data not found.");
+          window.location.href = "user_login.html";
+          return;
+        }
+        userCity = currentUser.city;
+        document.getElementById('welcomeUsername').innerText = currentUser.name || "User";
+
+        // Fetch and Display Data
+        fetchAlerts();
+        fetchAllDisasters();
+
+      }).catch(error => {
+        console.error("Error fetching user data:", error);
+        window.location.href = "user_login.html";
+      });
+    });
+
+    // Logout Function
+    function handleLogout() {
+      // Clear session storage and redirect to login page
+      sessionStorage.clear();
+      window.location.href = "user_login.html";
+    }
+
+    // Fetch Alerts (Only for User's Current Disaster)
+    function fetchAlerts() {
+      const disasterId = currentUser.currentDisasterId;
+      if (!disasterId) {
+        document.getElementById('alertContainer').innerHTML = '<p class="text-custom-blue">No active alerts for your disaster.</p>';
+        return;
+      }
+
+      // Fetch alerts specific to the user's current disaster and city
+      firebase.database().ref('alerts').once('value').then(snapshot => {
+        const alerts = snapshot.val();
+        const alertContainer = document.getElementById('alertContainer');
+        alertContainer.innerHTML = '';
+        for (let alertId in alerts) {
+          const alert = alerts[alertId];
+          if (alert.disasterId === disasterId && alert.city.toLowerCase() === userCity.toLowerCase()) {
+            const alertDiv = `
+              <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-2" role="alert">
+                <strong class="font-bold">${alert.severity} Alert:</strong>
+                <span class="block sm:inline">${alert.message}</span>
+              </div>
+            `;
+            alertContainer.innerHTML += alertDiv;
+          }
+        }
+        if (alertContainer.innerHTML === '') {
+          alertContainer.innerHTML = '<p class="text-custom-blue">No active alerts for your disaster.</p>';
+        }
+      }).catch(error => {
+        console.error("Error fetching alerts:", error);
+        document.getElementById('alertContainer').innerHTML = '<p class="text-red-500">Error fetching alerts.</p>';
+      });
+    }
+
+    // Fetch All Disasters (Dashboard Summary)
+    function fetchAllDisasters() {
+      firebase.database().ref('disasters').once('value').then(snapshot => {
+        const disasters = snapshot.val();
+        const disasterCards = document.getElementById('allDisasterCards');
+        disasterCards.innerHTML = '';
+        for (let disasterId in disasters) {
+          const disaster = disasters[disasterId];
+          const disasterCard = `
+            <div class="max-w-sm rounded overflow-hidden shadow-lg m-4">
+              <div class="px-6 py-4">
+                <div class="font-bold text-custom-blue text-xl mb-2">${disaster.name}</div>
+                <p class="text-custom-light-gray text-base">Severity: ${disaster.severity}</p>
+                <p class="text-custom-light-gray text-sm mt-2">${disaster.description}</p>
+              </div>
+            </div>
+          `;
+          disasterCards.innerHTML += disasterCard;
+        }
+        if (disasterCards.innerHTML === '') {
+          disasterCards.innerHTML = '<p class="text-custom-blue">No active disasters at the moment.</p>';
+        }
+      }).catch(error => {
+        console.error("Error fetching disasters:", error);
+        document.getElementById('allDisasterCards').innerHTML = '<p class="text-red-500">Error fetching disasters.</p>';
+      });
+    }
+  </script>
+</body>
+</html>

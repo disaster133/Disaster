@@ -256,6 +256,7 @@
                 <div class="button-container">
                     <a href="#" class="cta-btn" id="volunteer-btn">Volunteer</a>
                     <a href="#" class="cta-btn" id="citizen-btn">Citizen</a>
+                    <a href="#" class="cta-btn" id="admin-btn">Admin</a>
                 </div>
             </div>
         </div>
@@ -282,12 +283,17 @@
 
         // Redirect to Volunteer login/signup page
         document.getElementById('volunteer-btn').addEventListener('click', function() {
-            window.location.href = "volunteer.html"; // Replace with actual page
+            window.location.href = "volunteer_login.html"; // Replace with actual page
         });
 
         // Redirect to Citizen login/signup page
         document.getElementById('citizen-btn').addEventListener('click', function() {
             window.location.href = "citizen.html"; // Replace with actual page
+        });
+
+                // Redirect to Citizen login/signup page
+        document.getElementById('admin-btn').addEventListener('click', function() {
+            window.location.href = "admin_login.html"; // Replace with actual page
         });
 
         // Typing effect safety messages
