@@ -1,5 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
   <!-- Meta Tags -->
   <meta charset="UTF-8">
@@ -302,8 +303,13 @@
         }
         bodyHTML += `
           <td class="px-4 py-2 border">
-            <button onclick="editItem('${id}')" class="text-blue-500 hover:text-blue-700 mr-2"><i class="fas fa-edit"></i></button>
-            <button onclick="openDeleteModal('${id}')" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
+<button onclick="editItem('${id}')" class="text-blue-500 hover:text-blue-700 mr-2" aria-label="Edit item" title="Edit item">
+  <i class="fas fa-edit"></i>
+</button>
+<button onclick="openDeleteModal('${id}')" class="text-red-500 hover:text-red-700" aria-label="Delete item" title="Delete item">
+  <i class="fas fa-trash"></i>
+</button>
+
           </td>
         `;
         bodyHTML += '</tr>';
